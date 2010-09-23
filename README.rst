@@ -180,18 +180,78 @@ edges.
 
 
 
+Using Priop
+-----------
+
+
+Eligible Graph Edges
+^^^^^^^^^^^^^^^^^^^^
+
+Graph edges have to obey the following protocol:
+
+*   A ``.match()`` function taking the positional arguments given to the
+    Priop call and returning a truth value saying if the graph egde can be 
+    called with this arguments.
+
+*   It must be callable with arguments and keyword arguments.  The pure Python
+    definition thus looks like::
+        
+        def __call__(self, \*args, \*\*kwargs):
+
+Nothing more is required for a graph egde.
+
+
+Calling the Priop
+^^^^^^^^^^^^^^^^^
+
+Calling the graph happens like::
+    
+    subtract(ua, a)
+
+    subtract(a, ua)
+
+This will match the graph edges defined before against the arguments given 
+using the classes stored in the graph edges.  For the second call, the
+graph egde will call the function with argument order reversed.
+
+One can also give keyword arguments to the call of the priop.  Only the
+positional arguments are used to match the call arguments, and the keyword
+arguments are handed over to the underlying function unchanged.
+
+
+Population of the Priop
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The priop, created by::
+
+    priop = Priop()
+
+is populated by adding graph edges to it::
+    
+    priop.add(graph_edge)
+
+Graph egdes are created like::
+    
+    graph_edge = GraphEdge(classes, function[, take])
+
+where *classes* is a tuple defining the classes of the positional arguments 
+and the length of the positional tuple, *function* is the function the be 
+called on execution, and *take* is tuple defining the reordering of the 
+arguments before being handed over to the *function*.  If *take* is given, the 
+argument tuple to *function* will consist of the elements of the position 
+arguments selected by the indices which are the elements of the *take* tuple 
+(for an example, see the example section).
+
+
 Example
 -------
 
-
-Definition of the Priop
-^^^^^^^^^^^^^^^^^^^^^^^
-
-We take here the subtraction of objects.  We go into the numpy context, where 
-this package arises from.  numpy defines the class ``ndarray``, which will 
-treat non-ndarray objects as scalars.  Assume we have a class ``undarray``, which has ndimensional array functionality too, and knows how to combine with
-``ndaray``, but ``ndarray`` don't knows how to combine with ``undarray`` 
-properly.
+We take here as an example the subtraction of objects.  We go into the numpy 
+context, where this package arises from.  numpy defines the class ``ndarray``, 
+which will treat non-ndarray objects as scalars.  Assume we have a class 
+``undarray``, which has ndimensional array functionality too, and knows how to 
+combine with ``ndaray``, but ``ndarray`` don't knows how to combine with 
+``undarray`` properly.
 
 Calling now::
     
@@ -230,38 +290,3 @@ which order.  ``take=(4, 2)`` would, for an operand list ``args``, result in
 ``*(args[4], args[2])`` being handed over to the ``function``.  Without the 
 ``take`` argument, ``ua`` and ``a`` would not be reversed, and when calling
 the second graph egde, ``undarray.__radd__(a, ua)`` would thus be executed.
-
-
-Calling the Priop
-^^^^^^^^^^^^^^^^^
-
-Calling the graph happens like::
-    
-    subtract(ua, a)
-
-    subtract(a, ua)
-
-This will match the graph edges defined before against the arguments given 
-using the classes stored in the graph edges.  For the second call, the
-graph egde will call the function with argument order reversed.
-
-One can also give keyword arguments to the call of the priop.  Only the
-positional arguments are used to match the call arguments, and the keyword
-arguments are handed over to the underlying function unchanged.
-
-
-Eligible Graph Edges
-^^^^^^^^^^^^^^^^^^^^
-
-Graph edges have to obey the following protocol:
-
-*   A ``.match()`` function taking the positional arguments given to the
-    Priop call and returning a truth value saying if the graph egde can be 
-    called with this arguments.
-
-*   It must be callable with arguments and keyword arguments.  The pure Python
-    definition thus looks like::
-        
-        def __call__(self, \*args, \*\*kwargs):
-
-Nothing more is required for a graph egde.
